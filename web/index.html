@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WorldWeaver</title>
+  <style>
+    :root {
+      --bg-1: #07131d;
+      --bg-2: #132c3d;
+      --panel: rgba(10, 21, 31, 0.72);
+      --line: rgba(255, 255, 255, 0.14);
+      --text: #f4efe5;
+      --muted: #b6c8d1;
+      --accent: #f3a847;
+      --accent-2: #4ed3a1;
+      --danger: #f37d7d;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(78, 211, 161, 0.18), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(243, 168, 71, 0.20), transparent 26%),
+        linear-gradient(135deg, var(--bg-1), var(--bg-2));
+      font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+      min-height: 100vh;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding: 22px;
+      overflow-y: auto;
+      max-height: calc(100vh - 40px);
+    }
+
+    .headline {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .headline h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .headline p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .toggle-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    input, textarea, button {
+      font: inherit;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+    }
+
+    input, textarea {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      padding: 12px 14px;
+    }
+
+    textarea {
+      min-height: 104px;
+      resize: vertical;
+    }
+
+    button {
+      background: linear-gradient(135deg, var(--accent), #ffcf79);
+      color: #18222b;
+      font-weight: 700;
+      padding: 13px 16px;
+      cursor: pointer;
+      transition: transform 160ms ease, box-shadow 160ms ease;
+      box-shadow: 0 10px 26px rgba(243, 168, 71, 0.24);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .button-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    .meta {
+      display: grid;
+      gap: 10px;
+    }
+
+    .meta-card {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .meta-card h2 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-2);
+    }
+
+    .meta-card p, .meta-card pre {
+      margin: 0;
+      color: var(--text);
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    }
+
+    .story-card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+      border-color: rgba(243, 168, 71, 0.28);
+    }
+
+    .story-text {
+      font-size: 15px;
+      line-height: 1.8;
+      color: #f8f3ea;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .info-grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .info-row {
+      display: grid;
+      gap: 3px;
+    }
+
+    .info-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .info-value {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .intent-options {
+      display: grid;
+      gap: 8px;
+    }
+
+    .intent-option {
+      width: 100%;
+      text-align: left;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(78, 211, 161, 0.10);
+      color: var(--text);
+      border-color: rgba(78, 211, 161, 0.28);
+      box-shadow: none;
+      font-weight: 650;
+      line-height: 1.35;
+    }
+
+    .intent-option small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .canvas-panel {
+      position: relative;
+      overflow: hidden;
+      padding: 18px;
+    }
+
+    .canvas-frame {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 76px);
+      min-height: 520px;
+      border-radius: 26px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--line);
+      user-select: none;
+      touch-action: none;
+    }
+
+    #worldImage {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      cursor: crosshair;
+      background: rgba(0, 0, 0, 0.18);
+      user-select: none;
+      -webkit-user-drag: none;
+      touch-action: none;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .crosshair {
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      margin-left: -13px;
+      margin-top: -13px;
+      border-radius: 999px;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 6px rgba(243, 168, 71, 0.24);
+      background: rgba(243, 168, 71, 0.34);
+      display: none;
+    }
+
+    .selection-box {
+      position: absolute;
+      border: 2px solid #4ed3a1;
+      background: rgba(78, 211, 161, 0.18);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16) inset;
+      display: none;
+    }
+
+    .canvas-hud {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: end;
+      pointer-events: none;
+    }
+
+    .pill {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(7, 18, 28, 0.76);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .error {
+      color: var(--danger);
+    }
+
+    @media (max-width: 1080px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .canvas-frame {
+        height: 58vh;
+      }
+
+      .button-row {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        max-height: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="panel sidebar">
+      <div class="headline">
+        <h1>WorldWeaver</h1>
+        <p>Interactive comic mode: click the image to choose the narrative focus for the next panel.</p>
+      </div>
+
+      <div class="form-grid">
+        <label>
+          Topic
+          <input id="topicInput" value="Magic Library" />
+        </label>
+        <label>
+          Style Guide
+          <textarea id="styleInput">Continuous comic panels with cinematic framing, strong character consistency, expressive lighting, and clean environmental storytelling.</textarea>
+        </label>
+        <label>
+          Root Image Path
+          <input id="rootImageInput" placeholder="/path/to/root.png (optional)" />
+        </label>
+        <label>
+          Story Outline
+          <textarea id="storyOutlineInput" placeholder="Optional global story outline. Leave blank to let the planning agent draft one."></textarea>
+        </label>
+        <label>
+          Click Hint
+          <input id="hintInput" value="follow this character" />
+        </label>
+        <button id="startButton" type="button">Start New Session</button>
+        <div class="button-row">
+          <button id="previewButton" class="button-secondary" type="button">Preview Previous</button>
+          <button id="rollbackButton" class="button-secondary" type="button">Rollback Previous</button>
+          <button id="resumeButton" class="button-secondary" type="button">Resume Current</button>
+        </div>
+        <div class="toggle-row">
+          <button id="storyViewButton" class="button-secondary" type="button">Story View</button>
+          <button id="debugViewButton" class="button-secondary" type="button">Debug View</button>
+        </div>
+      </div>
+
+      <div class="meta">
+        <div id="storyMeta" class="meta-card story-card">
+          <h2>Novel Text</h2>
+          <p id="storyText" class="story-text">Start a session to see the generated literary narration.</p>
+        </div>
+        <div id="progressMeta" class="meta-card story-card">
+          <h2>Generation Progress</h2>
+          <div id="progressPanel" class="info-grid">
+            <div class="info-row">
+              <div class="info-label">Status</div>
+              <div class="info-value">Ready.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="debugMeta" class="meta">
+        <div class="meta-card">
+          <h2>Session</h2>
+          <p id="sessionText">No active session yet.</p>
+        </div>
+        <div class="meta-card">
+          <h2>World Summary</h2>
+          <p id="worldSummary">Create a session to start exploring.</p>
+        </div>
+        <div class="meta-card">
+          <h2>Perception</h2>
+          <div id="perceptionPanel" class="info-grid">
+            <div class="info-row">
+              <div class="info-label">Narrative Focus</div>
+              <div class="info-value">No clicks yet.</div>
+            </div>
+          </div>
+        </div>
+        <div class="meta-card">
+          <h2>Planning</h2>
+          <div id="planningPanel" class="info-grid">
+            <div class="info-row">
+              <div class="info-label">Next Panel</div>
+              <div class="info-value">No plan yet.</div>
+            </div>
+          </div>
+        </div>
+        <div class="meta-card">
+          <h2>Visual Prompt Template</h2>
+          <div id="visualPromptPanel" class="info-grid">
+            <div class="info-row">
+              <div class="info-label">Prompt Subject</div>
+              <div class="info-value">No prompt template yet.</div>
+            </div>
+          </div>
+        </div>
+        <div class="meta-card">
+          <h2>Render Prompt</h2>
+          <p id="renderPromptText">No prompt yet.</p>
+        </div>
+        <div class="meta-card">
+          <h2>Status</h2>
+          <p id="statusText">Ready.</p>
+        </div>
+      </div>
+    </aside>
+
+    <main class="panel canvas-panel">
+      <div id="canvasFrame" class="canvas-frame">
+        <img id="worldImage" alt="Current world page" draggable="false" />
+        <div class="overlay">
+          <div id="crosshair" class="crosshair"></div>
+          <div id="selectionBox" class="selection-box"></div>
+        </div>
+        <div class="canvas-hud">
+          <div class="pill" id="pageText">Current page: none</div>
+          <div class="pill" id="coordsText">Click coordinates: waiting</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const state = {
+      sessionId: null,
+      currentPage: null,
+      latestTurn: null,
+      config: null,
+      viewMode: "story",
+      narrationPollTimer: null,
+      interactionMode: "full",
+      pointerSession: null,
+      pendingIntentConfirmation: false,
+    };
+
+    const startButton = document.getElementById("startButton");
+    const previewButton = document.getElementById("previewButton");
+    const rollbackButton = document.getElementById("rollbackButton");
+    const resumeButton = document.getElementById("resumeButton");
+    const storyViewButton = document.getElementById("storyViewButton");
+    const debugViewButton = document.getElementById("debugViewButton");
+    const canvasFrame = document.getElementById("canvasFrame");
+    const worldImage = document.getElementById("worldImage");
+    const crosshair = document.getElementById("crosshair");
+    const selectionBox = document.getElementById("selectionBox");
+    const topicInput = document.getElementById("topicInput");
+    const styleInput = document.getElementById("styleInput");
+    const rootImageInput = document.getElementById("rootImageInput");
+    const storyOutlineInput = document.getElementById("storyOutlineInput");
+    const hintInput = document.getElementById("hintInput");
+    const sessionText = document.getElementById("sessionText");
+    const worldSummary = document.getElementById("worldSummary");
+    const storyMeta = document.getElementById("storyMeta");
+    const progressMeta = document.getElementById("progressMeta");
+    const debugMeta = document.getElementById("debugMeta");
+    const storyText = document.getElementById("storyText");
+    const progressPanel = document.getElementById("progressPanel");
+    const perceptionPanel = document.getElementById("perceptionPanel");
+    const planningPanel = document.getElementById("planningPanel");
+    const visualPromptPanel = document.getElementById("visualPromptPanel");
+    const renderPromptText = document.getElementById("renderPromptText");
+    const statusText = document.getElementById("statusText");
+    const pageText = document.getElementById("pageText");
+    const coordsText = document.getElementById("coordsText");
+
+    function stopNarrationPolling() {
+      if (state.narrationPollTimer) {
+        clearTimeout(state.narrationPollTimer);
+        state.narrationPollTimer = null;
+      }
+    }
+
+    function syncActionButtons(options = {}) {
+      const busy = options.busy ?? false;
+      const canRestore = options.canRestore ?? false;
+      const isPreviewing = options.isPreviewing ?? false;
+      startButton.disabled = busy;
+      previewButton.disabled = busy || !state.sessionId || !canRestore;
+      rollbackButton.disabled = busy || !state.sessionId || !canRestore;
+      resumeButton.disabled = busy || !state.sessionId || !isPreviewing;
+    }
+
+    function setBusy(isBusy, message) {
+      syncActionButtons({
+        busy: isBusy,
+        canRestore: true,
+        isPreviewing: false,
+      });
+      if (message) {
+        statusText.textContent = message;
+        statusText.classList.remove("error");
+      }
+    }
+
+    function setError(message) {
+      statusText.textContent = message;
+      statusText.classList.add("error");
+    }
+
+    function setStatus(message) {
+      statusText.textContent = message;
+      statusText.classList.remove("error");
+    }
+
+    function createInfoRow(label, value) {
+      return `
+        <div class="info-row">
+          <div class="info-label">${label}</div>
+          <div class="info-value">${value ?? "-"}</div>
+        </div>
+      `;
+    }
+
+    function createIntentOptions(options) {
+      if (!Array.isArray(options) || options.length === 0) {
+        return "";
+      }
+      const buttons = options.map((option, index) => {
+        const label = escapeHtml(option.label || option.description || option.action || "Intent option");
+        const description = escapeHtml(option.description || "");
+        const confidence = Number.isFinite(Number(option.confidence))
+          ? `${Math.round(Number(option.confidence) * 100)}%`
+          : "";
+        const hint = escapeHtml(option.description || option.label || "");
+        return `
+          <button
+            class="intent-option"
+            type="button"
+            data-intent-option="${index}"
+            data-intent-hint="${hint}"
+          >
+            ${label}
+            <small>${[description, confidence].filter(Boolean).join(" · ")}</small>
+          </button>
+        `;
+      }).join("");
+      return `
+        <div class="info-row">
+          <div class="info-label">Did you mean</div>
+          <div class="info-value intent-options">${buttons}</div>
+        </div>
+      `;
+    }
+
+    function createIntentDecision(perception) {
+      const options = perception.intent_options || [];
+      if (perception.requires_user_confirmation) {
+        return createIntentOptions(options);
+      }
+      const accepted = perception.accepted_intent_option || options[0];
+      if (!accepted) {
+        return "";
+      }
+      const confidence = Number.isFinite(Number(accepted.confidence))
+        ? `${Math.round(Number(accepted.confidence) * 100)}%`
+        : "-";
+      const threshold = Number.isFinite(Number(perception.intent_confidence_threshold))
+        ? `${Math.round(Number(perception.intent_confidence_threshold) * 100)}%`
+        : "-";
+      const label = escapeHtml(accepted.label || accepted.description || accepted.action || "Accepted intent");
+      const detail = escapeHtml(accepted.description || "");
+      return [
+        createInfoRow("Auto Accepted Intent", label),
+        createInfoRow("Intent Confidence", escapeHtml(`${confidence} / threshold ${threshold}`)),
+        detail ? createInfoRow("Accepted Intent Detail", detail) : "",
+      ].join("");
+    }
+
+    function setViewMode(mode) {
+      state.viewMode = mode;
+      const storyMode = mode === "story";
+      storyMeta.classList.toggle("hidden", false);
+      progressMeta.classList.toggle("hidden", false);
+      debugMeta.classList.toggle("hidden", storyMode);
+      storyViewButton.disabled = storyMode;
+      debugViewButton.disabled = !storyMode;
+    }
+
+    function renderProgress(data) {
+      const turn = data?.latest_turn || state.latestTurn || {};
+      const plan = turn.plan || {};
+      const renderResult = turn.render_result || {};
+      progressPanel.innerHTML = [
+        createInfoRow("Status", escapeHtml(statusText.textContent || "Ready.")),
+        createInfoRow("Page", escapeHtml(data?.current_page?.page_id || state.currentPage?.page_id || "none")),
+        createInfoRow("Interaction Mode", escapeHtml(data?.interaction_mode || state.interactionMode || "full")),
+        createInfoRow("Story Outline Revision", escapeHtml(data?.story_outline_revision ?? "")),
+        createInfoRow("Mode", escapeHtml(data?.is_previewing ? "preview" : "live")),
+        createInfoRow("Action", escapeHtml(plan.action)),
+        createInfoRow("Branch", escapeHtml(plan.branch_label)),
+        createInfoRow("Summary", escapeHtml(renderResult.page_summary || data?.page_summary)),
+      ].join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    async function fetchJson(url, options = {}) {
+      const response = await fetch(url, {
+        headers: { "Content-Type": "application/json" },
+        ...options,
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(JSON.stringify(data));
+      }
+      return data;
+    }
+
+    function buildRootTurnFromCurrentPage() {
+      if (!state.currentPage) {
+        return null;
+      }
+
+      const topic = topicInput.value.trim();
+      return {
+        perception: {
+          target_label: topic || state.currentPage.page_id,
+          region_caption: state.currentPage.summary || "",
+          intent_hint: "root_page",
+          confidence: 1,
+          focus_type: "root_page",
+          focus_subject: topic || state.currentPage.page_id,
+          story_role: "world_entry",
+          emotion_hint: "",
+          next_panel_expectation: "first exploration choice",
+          interaction_intent: "open_session",
+          interaction_reason: "establish the world before the first click",
+          suggested_story_direction: "introduce the setting and invite exploration",
+          notes: [],
+        },
+        plan: {
+          action: "reframe",
+          branch_id: "main",
+          branch_label: "Main Branch",
+          rationale: "Opening page before interactive exploration begins.",
+          continuity_mode: "root_page",
+          scene_location: topic || "",
+          primary_actor: topic || "",
+          primary_action: "introduce the world",
+          supporting_subject: "",
+          next_story_beat: state.currentPage.summary || "",
+          story_purpose: "establish opening setting",
+          shot_type: "establishing shot",
+          narrative_function: "introduce_world",
+          transition_type: "opening",
+          prompt_subject: topic || "",
+          prompt_action: "establish the opening scene",
+          prompt_environment_change: "",
+          prompt_new_element: "",
+          prompt_background_continuity: "opening page",
+          protected_entities: [],
+          continuity_notes: [],
+          render_prompt: state.currentPage.prompt || "",
+        },
+        render_result: {
+          page_id: state.currentPage.page_id,
+          image_uri: state.currentPage.image_uri,
+          page_summary: state.currentPage.summary || "",
+          metadata: {},
+        },
+        narration: {
+          status: state.currentPage.narration_status || "ready",
+          error: state.currentPage.narration_error || null,
+          story_text: state.currentPage.story_text || "",
+          summary_text: state.currentPage.summary || "",
+          caption_text: state.currentPage.caption_text || "",
+          metadata: {},
+        },
+      };
+    }
+
+    function getRenderedImageMetrics() {
+      const rect = worldImage.getBoundingClientRect();
+      const naturalWidth = worldImage.naturalWidth || rect.width;
+      const naturalHeight = worldImage.naturalHeight || rect.height;
+
+      if (!naturalWidth || !naturalHeight || !rect.width || !rect.height) {
+        return null;
+      }
+
+      const imageAspect = naturalWidth / naturalHeight;
+      const boxAspect = rect.width / rect.height;
+
+      let renderedWidth;
+      let renderedHeight;
+      let offsetX;
+      let offsetY;
+
+      if (imageAspect > boxAspect) {
+        renderedWidth = rect.width;
+        renderedHeight = rect.width / imageAspect;
+        offsetX = 0;
+        offsetY = (rect.height - renderedHeight) / 2;
+      } else {
+        renderedHeight = rect.height;
+        renderedWidth = rect.height * imageAspect;
+        offsetY = 0;
+        offsetX = (rect.width - renderedWidth) / 2;
+      }
+
+      return {
+        renderedWidth,
+        renderedHeight,
+        offsetX,
+        offsetY,
+      };
+    }
+
+    function renderTurnPanels(turn) {
+      if (!turn) {
+        storyText.textContent = "Start a session to see the generated literary narration.";
+        progressPanel.innerHTML = createInfoRow("Status", escapeHtml(statusText.textContent || "Ready."));
+        perceptionPanel.innerHTML = createInfoRow("Narrative Focus", "No clicks yet.");
+        planningPanel.innerHTML = createInfoRow("Next Panel", "No plan yet.");
+        visualPromptPanel.innerHTML = createInfoRow("Prompt Subject", "No prompt template yet.");
+        renderPromptText.textContent = "No prompt yet.";
+        return;
+      }
+
+      const perception = turn.perception || {};
+      const plan = turn.plan || {};
+      const renderResult = turn.render_result || {};
+      const narration = turn.narration || {};
+      const narrationStatus = narration.status || "ready";
+      const intentOnly = Boolean(renderResult.metadata?.intent_only);
+
+      storyText.textContent =
+        narration.story_text ||
+        (narrationStatus === "pending"
+          ? "Narration is being generated in the background..."
+          : intentOnly
+            ? "Intent-only mode: this click ran perception and planning only. No new image was generated."
+            : renderResult.page_summary || "No literary narration yet.");
+
+      perceptionPanel.innerHTML = [
+        createIntentDecision(perception),
+        createInfoRow("Target", escapeHtml(perception.target_label)),
+        createInfoRow("Clicked Region", escapeHtml(perception.clicked_region ? JSON.stringify(perception.clicked_region) : "")),
+        createInfoRow("Focus Type", escapeHtml(perception.focus_type)),
+        createInfoRow("Focus Subject", escapeHtml(perception.focus_subject)),
+        createInfoRow("Story Role", escapeHtml(perception.story_role)),
+        createInfoRow("Interaction Intent", escapeHtml(perception.interaction_intent)),
+        createInfoRow("Interaction Reason", escapeHtml(perception.interaction_reason)),
+        createInfoRow("Suggested Story Direction", escapeHtml(perception.suggested_story_direction)),
+        createInfoRow("Emotion", escapeHtml(perception.emotion_hint)),
+        createInfoRow("Intent", escapeHtml(perception.intent_hint)),
+        createInfoRow("Next Panel Expectation", escapeHtml(perception.next_panel_expectation)),
+        createInfoRow("Region Description", escapeHtml(perception.region_caption)),
+      ].join("");
+
+      planningPanel.innerHTML = [
+        createInfoRow("Action", escapeHtml(plan.action)),
+        createInfoRow("Continuity Mode", escapeHtml(plan.continuity_mode)),
+        createInfoRow("Scene Location", escapeHtml(plan.scene_location)),
+        createInfoRow("Primary Actor", escapeHtml(plan.primary_actor)),
+        createInfoRow("Primary Action", escapeHtml(plan.primary_action)),
+        createInfoRow("Supporting Subject", escapeHtml(plan.supporting_subject)),
+        createInfoRow("Next Story Beat", escapeHtml(plan.next_story_beat)),
+        createInfoRow("Story Purpose", escapeHtml(plan.story_purpose)),
+        createInfoRow("Global Intent Alignment", escapeHtml(plan.global_intent_alignment)),
+        createInfoRow("Global Intent Rationale", escapeHtml(plan.global_intent_rationale)),
+        createInfoRow("Story Outline Update", escapeHtml(plan.story_outline_update)),
+        createInfoRow("Shot Type", escapeHtml(plan.shot_type)),
+        createInfoRow("Narrative Function", escapeHtml(plan.narrative_function)),
+        createInfoRow("Transition", escapeHtml(plan.transition_type)),
+        createInfoRow("Protected Entities", escapeHtml((plan.protected_entities || []).join(", "))),
+        createInfoRow("Branch", escapeHtml(plan.branch_label)),
+        createInfoRow("Rationale", escapeHtml(plan.rationale)),
+        createInfoRow("Page Summary", escapeHtml(renderResult.page_summary)),
+      ].join("");
+
+      visualPromptPanel.innerHTML = [
+        createInfoRow("Prompt Subject", escapeHtml(plan.prompt_subject)),
+        createInfoRow("Prompt Action", escapeHtml(plan.prompt_action)),
+        createInfoRow("Environment Change", escapeHtml(plan.prompt_environment_change)),
+        createInfoRow("New Element", escapeHtml(plan.prompt_new_element)),
+        createInfoRow("Background Continuity", escapeHtml(plan.prompt_background_continuity)),
+        createInfoRow("Intent Only", escapeHtml(renderResult.metadata?.intent_only)),
+        createInfoRow("Conditioning Mode", escapeHtml(renderResult.metadata?.resolved_conditioning_mode || renderResult.metadata?.image_conditioning_mode)),
+        createInfoRow("Reference Used", escapeHtml(renderResult.metadata?.used_reference_image)),
+        createInfoRow("IP-Adapter Used", escapeHtml(renderResult.metadata?.used_ip_adapter)),
+        createInfoRow("Entity Reference Count", escapeHtml(renderResult.metadata?.used_entity_reference_count)),
+        createInfoRow("Reference Crop", escapeHtml(renderResult.metadata?.reference_crop_applied)),
+        createInfoRow("Img2Img Strength", escapeHtml(renderResult.metadata?.img2img_strength ?? renderResult.metadata?.resolved_img2img_strength)),
+        createInfoRow("IP-Adapter Scale", escapeHtml(renderResult.metadata?.ip_adapter_scale)),
+      ].join("");
+
+      renderPromptText.textContent = plan.render_prompt || "No prompt yet.";
+      renderProgress({
+        latest_turn: turn,
+        current_page: state.currentPage,
+        is_previewing: false,
+        page_summary: renderResult.page_summary,
+      });
+    }
+
+    async function pollNarration(pageId) {
+      if (!state.sessionId || !pageId) {
+        return;
+      }
+      try {
+        const data = await fetchJson(`/api/sessions/${state.sessionId}/pages/${pageId}/narration`);
+        if (state.currentPage?.page_id !== pageId) {
+          stopNarrationPolling();
+          return;
+        }
+        const narration = data.narration || {};
+
+        if (state.latestTurn?.render_result?.page_id === pageId) {
+          state.latestTurn = {
+            ...state.latestTurn,
+            narration: {
+              ...(state.latestTurn.narration || {}),
+              ...narration,
+            },
+          };
+          renderTurnPanels(state.latestTurn);
+        }
+
+        if (state.currentPage?.page_id === pageId) {
+          state.currentPage = {
+            ...state.currentPage,
+            narration_status: narration.status || state.currentPage.narration_status,
+            narration_error: narration.error || null,
+            story_text: narration.story_text || state.currentPage.story_text,
+            caption_text: narration.caption_text || state.currentPage.caption_text,
+          };
+          if (!state.latestTurn) {
+            renderTurnPanels(buildRootTurnFromCurrentPage());
+          }
+        }
+
+        if (narration.status === "pending") {
+          stopNarrationPolling();
+          state.narrationPollTimer = setTimeout(() => pollNarration(pageId), 1200);
+          return;
+        }
+
+        stopNarrationPolling();
+      } catch (error) {
+        stopNarrationPolling();
+      }
+    }
+
+    function refreshWorldImage(imageUrl) {
+      if (!imageUrl) {
+        worldImage.removeAttribute("src");
+        return;
+      }
+      if (worldImage.src === imageUrl) {
+        worldImage.removeAttribute("src");
+      }
+      worldImage.src = imageUrl;
+    }
+
+    function clearInteractionOverlays() {
+      crosshair.style.display = "none";
+      selectionBox.style.display = "none";
+    }
+
+    function updateUiFromSession(data) {
+      state.sessionId = data.session_id;
+      state.currentPage = data.current_page;
+      state.latestTurn = data.latest_turn ?? null;
+      state.interactionMode = data.interaction_mode ?? state.config?.interaction_mode ?? "full";
+      state.pendingIntentConfirmation = Boolean(data.pending_intent_confirmation);
+      stopNarrationPolling();
+      const modeLabel = data.is_previewing ? "preview" : "live";
+      sessionText.textContent = `${data.topic} ? ${data.session_id} ? ${modeLabel}`;
+      worldSummary.textContent = data.world_summary || "No world summary yet.";
+      if (data.story_outline) {
+        storyOutlineInput.value = data.story_outline;
+      }
+      pageText.textContent = `Current page: ${data.current_page.page_id}`;
+      clearInteractionOverlays();
+      refreshWorldImage(data.current_page.image_url);
+      syncActionButtons({
+        busy: false,
+        canRestore: data.can_restore_previous,
+        isPreviewing: data.is_previewing,
+      });
+      renderTurnPanels(state.latestTurn || buildRootTurnFromCurrentPage());
+      renderProgress(data);
+      if (
+        !data.is_previewing &&
+        !data.intent_only &&
+        state.currentPage?.narration_status === "pending"
+      ) {
+        pollNarration(state.currentPage.page_id);
+      }
+    }
+
+    async function loadConfig() {
+      state.config = await fetchJson("/api/config");
+      state.interactionMode = state.config.interaction_mode || "full";
+      setStatus(`Comic mode ready. interaction=${state.interactionMode}, planning=${state.config.planning_backend}, perception=${state.config.perception_backend}, rendering=${state.config.rendering_backend}`);
+      syncActionButtons({
+        busy: false,
+        canRestore: false,
+        isPreviewing: false,
+      });
+    }
+
+    async function createSession() {
+      setBusy(true, "Creating session and preparing the opening panel...");
+      try {
+        const payload = {
+          topic: topicInput.value.trim(),
+          style_guide: styleInput.value.trim(),
+          root_image_path: rootImageInput.value.trim() || null,
+          story_outline: storyOutlineInput.value.trim() || null,
+          auto_generate_story_outline: !storyOutlineInput.value.trim(),
+        };
+        const data = await fetchJson("/api/sessions", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+        state.latestTurn = null;
+        clearInteractionOverlays();
+        updateUiFromSession(data);
+        setStatus(
+          state.interactionMode === "intent_only"
+            ? "Session is ready. Click on the image to inspect perception and planning only."
+            : "Session is ready. Click on the image to choose the next panel focus."
+        );
+      } catch (error) {
+        setError(`Failed to create session: ${error.message}`);
+      } finally {
+        syncActionButtons({
+          busy: false,
+          canRestore: false,
+          isPreviewing: false,
+        });
+      }
+    }
+
+    async function restoreSession(mode) {
+      if (!state.sessionId) {
+        setError("Create a session first.");
+        return;
+      }
+
+      const message = mode === "preview"
+        ? "Loading the previous panel preview..."
+        : "Rolling back to the previous story state...";
+
+      setBusy(true, message);
+      try {
+        const data = await fetchJson(`/api/sessions/${state.sessionId}/restore`, {
+          method: "POST",
+          body: JSON.stringify({ mode }),
+        });
+        updateUiFromSession(data);
+        setStatus(data.restore?.message || "Restore finished.");
+      } catch (error) {
+        setError(`Restore failed: ${error.message}`);
+      }
+    }
+
+    async function resumeCurrent() {
+      if (!state.sessionId) {
+        setError("Create a session first.");
+        return;
+      }
+
+      setBusy(true, "Returning to the current story state...");
+      try {
+        const data = await fetchJson(`/api/sessions/${state.sessionId}/resume`, {
+          method: "POST",
+        });
+        clearInteractionOverlays();
+        updateUiFromSession(data);
+        setStatus(data.restore?.message || "Returned to the current panel.");
+      } catch (error) {
+        setError(`Resume failed: ${error.message}`);
+      }
+    }
+
+    function getNormalizedPointFromEvent(event) {
+      if (!state.sessionId) {
+        return null;
+      }
+
+      const rect = worldImage.getBoundingClientRect();
+      const metrics = getRenderedImageMetrics();
+      if (!metrics) {
+        return { error: "Image is still loading. Please try again in a moment." };
+      }
+
+      const { renderedWidth, renderedHeight, offsetX, offsetY } = metrics;
+      const localX = event.clientX - rect.left - offsetX;
+      const localY = event.clientY - rect.top - offsetY;
+
+      if (localX < 0 || localX > renderedWidth || localY < 0 || localY > renderedHeight) {
+        return { outside: true };
+      }
+
+      const nx = localX / renderedWidth;
+      const ny = localY / renderedHeight;
+      const markerX = offsetX + nx * renderedWidth;
+      const markerY = offsetY + ny * renderedHeight;
+      return { nx, ny, markerX, markerY, renderedWidth, renderedHeight, offsetX, offsetY };
+    }
+
+    async function submitInteraction(payload, successMessage) {
+      setBusy(
+        true,
+        state.interactionMode === "intent_only"
+          ? "Agent is analyzing user intent without generating a new image..."
+          : "Agent is choosing the next comic panel..."
+      );
+      try {
+        const data = await fetchJson(`/api/sessions/${state.sessionId}/click`, {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+        updateUiFromSession(data);
+        const statusMessage = data.pending_intent_confirmation
+          ? "Please confirm the intended action before generating the next panel."
+          : data.intent_only
+            ? successMessage || "Intent analysis complete. Review the perception and planning panels."
+            : "Next panel generated. Click again to continue the comic.";
+        setStatus(statusMessage);
+      } catch (error) {
+        setError(`Click failed: ${error.message}`);
+      }
+    }
+
+    async function confirmIntentOption(button) {
+      if (!state.sessionId || !state.pendingIntentConfirmation) {
+        const hint = button.dataset.intentHint || button.textContent.trim();
+        hintInput.value = hint;
+        setStatus(`Intent option selected: ${hint}`);
+        return;
+      }
+      const hint = button.dataset.intentHint || button.textContent.trim();
+      const optionIndex = Number(button.dataset.intentOption);
+      setBusy(true, "Intent confirmed. Generating the next panel...");
+      try {
+        const data = await fetchJson(`/api/sessions/${state.sessionId}/confirm-intent`, {
+          method: "POST",
+          body: JSON.stringify({
+            option_index: Number.isFinite(optionIndex) ? optionIndex : null,
+            user_hint: hint,
+          }),
+        });
+        hintInput.value = hint;
+        updateUiFromSession(data);
+        setStatus("Intent confirmed and next panel generated.");
+      } catch (error) {
+        setError(`Intent confirmation failed: ${error.message}`);
+      }
+    }
+
+    function beginPointerInteraction(event) {
+      if (!state.sessionId) {
+        return;
+      }
+      const point = getNormalizedPointFromEvent(event);
+      if (!point || point.error || point.outside) {
+        return;
+      }
+      event.preventDefault();
+      if (typeof canvasFrame.setPointerCapture === "function") {
+        try {
+          canvasFrame.setPointerCapture(event.pointerId);
+        } catch (error) {
+        }
+      }
+      state.pointerSession = {
+        pointerId: event.pointerId,
+        startClientX: event.clientX,
+        startClientY: event.clientY,
+        startTime: Date.now(),
+        startPoint: point,
+        moved: false,
+      };
+    }
+
+    function updatePointerInteraction(event) {
+      const session = state.pointerSession;
+      if (!session || session.pointerId !== event.pointerId) {
+        return;
+      }
+      event.preventDefault();
+      const point = getNormalizedPointFromEvent(event);
+      if (!point || point.error) {
+        return;
+      }
+      if (point.outside) {
+        if (session.moved) {
+          selectionBox.style.display = "none";
+        }
+        return;
+      }
+      const dx = event.clientX - session.startClientX;
+      const dy = event.clientY - session.startClientY;
+      const dragDistance = Math.hypot(dx, dy);
+      if (dragDistance < 10) {
+        return;
+      }
+
+      session.moved = true;
+      const left = Math.min(session.startPoint.markerX, point.markerX);
+      const top = Math.min(session.startPoint.markerY, point.markerY);
+      const width = Math.abs(point.markerX - session.startPoint.markerX);
+      const height = Math.abs(point.markerY - session.startPoint.markerY);
+      selectionBox.style.left = `${left}px`;
+      selectionBox.style.top = `${top}px`;
+      selectionBox.style.width = `${width}px`;
+      selectionBox.style.height = `${height}px`;
+      selectionBox.style.display = "block";
+      crosshair.style.display = "none";
+    }
+
+    async function endPointerInteraction(event) {
+      const session = state.pointerSession;
+      if (!session || session.pointerId !== event.pointerId) {
+        return;
+      }
+      event.preventDefault();
+      if (typeof canvasFrame.releasePointerCapture === "function") {
+        try {
+          canvasFrame.releasePointerCapture(event.pointerId);
+        } catch (error) {
+        }
+      }
+      state.pointerSession = null;
+      const point = getNormalizedPointFromEvent(event) || session.startPoint;
+      const durationMs = Date.now() - session.startTime;
+      const hint = hintInput.value.trim() || null;
+
+      if (session.moved && point && !point.error && !point.outside) {
+        const start = session.startPoint;
+        const left = Math.max(0, Math.min(start.nx, point.nx));
+        const top = Math.max(0, Math.min(start.ny, point.ny));
+        const width = Math.min(1 - left, Math.abs(point.nx - start.nx));
+        const height = Math.min(1 - top, Math.abs(point.ny - start.ny));
+        if (width >= 0.01 && height >= 0.01) {
+          const centerX = left + width / 2;
+          const centerY = top + height / 2;
+          coordsText.textContent = `Selection box: x=${centerX.toFixed(3)}, y=${centerY.toFixed(3)}, w=${width.toFixed(3)}, h=${height.toFixed(3)} | mode=box`;
+          await submitInteraction(
+            {
+              x: centerX,
+              y: centerY,
+              user_hint: hint,
+              interaction_type: "box",
+              selection_box: { left, top, width, height },
+              press_duration_ms: durationMs,
+            },
+            "Box-selection intent analysis complete. Review the precise-object interpretation."
+          );
+          return;
+        }
+      }
+
+      if (point?.error) {
+        setError(point.error);
+        clearInteractionOverlays();
+        return;
+      }
+
+      if (point?.outside) {
+        setStatus("Clicked outside the actual image area. Please click inside the picture.");
+        clearInteractionOverlays();
+        return;
+      }
+
+      if (!point) {
+        setError("Image is still loading. Please try again in a moment.");
+        clearInteractionOverlays();
+        return;
+      }
+
+      if (durationMs >= 450) {
+        const start = session.startPoint;
+        crosshair.style.left = `${start.markerX}px`;
+        crosshair.style.top = `${start.markerY}px`;
+        crosshair.style.display = "block";
+        selectionBox.style.display = "none";
+        coordsText.textContent = `Click coordinates: x=${start.nx.toFixed(3)}, y=${start.ny.toFixed(3)} | mode=long_press`;
+        await submitInteraction(
+          {
+            x: start.nx,
+            y: start.ny,
+            user_hint: hint,
+            interaction_type: "long_press",
+            selection_box: null,
+            press_duration_ms: durationMs,
+          },
+          "Long-press intent analysis complete. Review the deeper-unfolding interpretation."
+        );
+        return;
+      }
+
+      crosshair.style.left = `${point.markerX}px`;
+      crosshair.style.top = `${point.markerY}px`;
+      crosshair.style.display = "block";
+      selectionBox.style.display = "none";
+      coordsText.textContent = `Click coordinates: x=${point.nx.toFixed(3)}, y=${point.ny.toFixed(3)} | mode=click`;
+      await submitInteraction(
+        {
+          x: point.nx,
+          y: point.ny,
+          user_hint: hint,
+          interaction_type: "click",
+          selection_box: null,
+          press_duration_ms: durationMs,
+        },
+        "Click intent analysis complete. Review the perception and planning panels."
+      );
+    }
+
+    function cancelPointerInteraction(event) {
+      const session = state.pointerSession;
+      if (session && typeof canvasFrame.releasePointerCapture === "function") {
+        try {
+          canvasFrame.releasePointerCapture(event.pointerId);
+        } catch (error) {
+        }
+      }
+      state.pointerSession = null;
+      clearInteractionOverlays();
+    }
+
+    worldImage.addEventListener("dragstart", (event) => {
+      event.preventDefault();
+    });
+
+    worldImage.addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+    });
+
+    canvasFrame.addEventListener("pointerleave", () => {
+      if (state.pointerSession?.moved) {
+        selectionBox.style.display = "none";
+      }
+    });
+
+    startButton.addEventListener("click", createSession);
+    previewButton.addEventListener("click", () => restoreSession("preview"));
+    rollbackButton.addEventListener("click", () => restoreSession("rollback"));
+    resumeButton.addEventListener("click", resumeCurrent);
+    storyViewButton.addEventListener("click", () => setViewMode("story"));
+    debugViewButton.addEventListener("click", () => setViewMode("debug"));
+    canvasFrame.addEventListener("pointerdown", beginPointerInteraction);
+    window.addEventListener("pointermove", updatePointerInteraction);
+    window.addEventListener("pointerup", endPointerInteraction);
+    window.addEventListener("pointercancel", cancelPointerInteraction);
+    perceptionPanel.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-intent-option]");
+      if (!button) {
+        return;
+      }
+      confirmIntentOption(button);
+    });
+    window.addEventListener("resize", () => {
+      clearInteractionOverlays();
+    });
+    worldImage.addEventListener("load", () => {
+      clearInteractionOverlays();
+    });
+    setViewMode("story");
+    renderTurnPanels(null);
+    loadConfig().catch((error) => setError(`Failed to load config: ${error.message}`));
+  </script>
+</body>
+</html>

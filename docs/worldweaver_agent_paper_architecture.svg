@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1120" viewBox="0 0 1900 1120" role="img" aria-labelledby="title desc">
+  <title id="title">Paper-Style Architecture of the Interactive Comic Agent</title>
+  <desc id="desc">A polished paper-style architecture diagram showing perception, planning, rendering, and memory update paths.</desc>
+  <defs>
+    <linearGradient id="paperBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f7f8fb"/>
+    </linearGradient>
+    <linearGradient id="perceptionFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f7fff9"/>
+      <stop offset="100%" stop-color="#eef8f1"/>
+    </linearGradient>
+    <linearGradient id="planningFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbf8ff"/>
+      <stop offset="100%" stop-color="#f2ecfb"/>
+    </linearGradient>
+    <linearGradient id="renderFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f5fcff"/>
+      <stop offset="100%" stop-color="#eaf5fa"/>
+    </linearGradient>
+    <linearGradient id="memoryFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fffdf8"/>
+      <stop offset="100%" stop-color="#faf2df"/>
+    </linearGradient>
+    <filter id="softShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#111827" flood-opacity="0.12"/>
+    </filter>
+    <filter id="lightShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#111827" flood-opacity="0.08"/>
+    </filter>
+    <marker id="arrowMain" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#263238"/>
+    </marker>
+    <marker id="arrowMemory" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9a6b21"/>
+    </marker>
+    <style>
+      .title { font: 700 40px "Times New Roman", Georgia, serif; fill: #111827; letter-spacing: 0; }
+      .subtitle { font: 400 18px "Times New Roman", Georgia, serif; fill: #4b5563; letter-spacing: 0; }
+      .moduleTitle { font: 700 25px "Times New Roman", Georgia, serif; fill: #111827; letter-spacing: 0; }
+      .moduleSub { font: 400 16px "Times New Roman", Georgia, serif; fill: #4b5563; letter-spacing: 0; }
+      .sectionTitle { font: 700 16px "Times New Roman", Georgia, serif; fill: #111827; letter-spacing: 0; }
+      .text { font: 400 16px "Times New Roman", Georgia, serif; fill: #263238; letter-spacing: 0; }
+      .small { font: 400 14px "Times New Roman", Georgia, serif; fill: #4b5563; letter-spacing: 0; }
+      .mono { font: 600 14px "Courier New", monospace; fill: #263238; letter-spacing: 0; }
+      .tag { font: 600 13px "Times New Roman", Georgia, serif; letter-spacing: 0; }
+      .mainArrow { fill: none; stroke: #263238; stroke-width: 3; marker-end: url(#arrowMain); }
+      .memoryArrow { fill: none; stroke: #9a6b21; stroke-width: 2.6; stroke-dasharray: 9 7; marker-end: url(#arrowMemory); }
+      .feedbackArrow { fill: none; stroke: #9a6b21; stroke-width: 2.3; stroke-dasharray: 7 7; marker-end: url(#arrowMemory); opacity: 0.86; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1900" height="1120" fill="url(#paperBg)"/>
+
+  <rect x="70" y="40" width="1760" height="1010" rx="18" fill="#ffffff" stroke="#e5e7eb" stroke-width="1.5"/>
+
+  <text x="950" y="100" text-anchor="middle" class="title">Memory-Augmented Interactive Comic Generation Agent</text>
+  <text x="950" y="136" text-anchor="middle" class="subtitle">Click-conditioned intent recognition, planning, and next-frame synthesis with persistent memory</text>
+
+  <rect x="105" y="245" width="270" height="245" rx="12" fill="#ffffff" stroke="#cfd7e3" stroke-width="2" filter="url(#lightShadow)"/>
+  <rect x="105" y="245" width="270" height="54" rx="12" fill="#f3f6fb" stroke="#cfd7e3" stroke-width="2"/>
+  <path d="M 105 287 L 375 287" stroke="#cfd7e3" stroke-width="2"/>
+  <text x="240" y="281" text-anchor="middle" class="moduleTitle">User Input</text>
+  <text x="142" y="348" class="text">Image frame</text>
+  <text x="142" y="390" class="text">Click coordinate</text>
+  <text x="142" y="432" class="text">WorldState</text>
+
+  <rect x="475" y="210" width="330" height="315" rx="14" fill="url(#perceptionFill)" stroke="#2f7d48" stroke-width="2.5" filter="url(#softShadow)"/>
+  <text x="640" y="258" text-anchor="middle" class="moduleTitle">Perception Agent</text>
+  <text x="640" y="286" text-anchor="middle" class="moduleSub">user intent recognition</text>
+  <rect x="515" y="330" width="250" height="70" rx="8" fill="#ffffff" stroke="#b9d8c1" stroke-width="1.8"/>
+  <text x="640" y="358" text-anchor="middle" class="sectionTitle">Input</text>
+  <text x="640" y="383" text-anchor="middle" class="small">Image + Click + WorldState</text>
+  <rect x="515" y="425" width="250" height="72" rx="8" fill="#ffffff" stroke="#b9d8c1" stroke-width="1.8"/>
+  <text x="640" y="453" text-anchor="middle" class="sectionTitle">Output</text>
+  <text x="640" y="478" text-anchor="middle" class="small">action + description</text>
+  <rect x="528" y="304" width="224" height="22" rx="11" fill="#e8f5eb" stroke="#a8ceb3" stroke-width="1"/>
+  <text x="640" y="320" text-anchor="middle" class="tag" fill="#245531">4-class interaction intent</text>
+
+  <rect x="905" y="210" width="360" height="315" rx="14" fill="url(#planningFill)" stroke="#7056a6" stroke-width="2.5" filter="url(#softShadow)"/>
+  <text x="1085" y="258" text-anchor="middle" class="moduleTitle">Planning Agent</text>
+  <text x="1085" y="286" text-anchor="middle" class="moduleSub">narrative decision and prompt assembly</text>
+  <rect x="947" y="330" width="276" height="70" rx="8" fill="#ffffff" stroke="#cdbce8" stroke-width="1.8"/>
+  <text x="1085" y="358" text-anchor="middle" class="sectionTitle">Input</text>
+  <text x="1085" y="383" text-anchor="middle" class="small">Image + Click + State + Intent</text>
+  <rect x="947" y="425" width="276" height="72" rx="8" fill="#ffffff" stroke="#cdbce8" stroke-width="1.8"/>
+  <text x="1085" y="453" text-anchor="middle" class="sectionTitle">Output</text>
+  <text x="1085" y="478" text-anchor="middle" class="small">render prompt</text>
+  <rect x="950" y="304" width="270" height="22" rx="11" fill="#f1eafa" stroke="#c4b0e2" stroke-width="1"/>
+  <text x="1085" y="320" text-anchor="middle" class="tag" fill="#5b2f91">planning + condition assembly</text>
+
+  <rect x="1385" y="210" width="350" height="315" rx="14" fill="url(#renderFill)" stroke="#216f86" stroke-width="2.5" filter="url(#softShadow)"/>
+  <text x="1560" y="258" text-anchor="middle" class="moduleTitle">Rendering Agent</text>
+  <text x="1560" y="286" text-anchor="middle" class="moduleSub">conditioned next-frame synthesis</text>
+  <rect x="1427" y="330" width="266" height="70" rx="8" fill="#ffffff" stroke="#b5d6e0" stroke-width="1.8"/>
+  <text x="1560" y="358" text-anchor="middle" class="sectionTitle">Input</text>
+  <text x="1560" y="383" text-anchor="middle" class="small">Prompt + WorldState + Condition</text>
+  <rect x="1427" y="425" width="266" height="72" rx="8" fill="#ffffff" stroke="#b5d6e0" stroke-width="1.8"/>
+  <text x="1560" y="453" text-anchor="middle" class="sectionTitle">Output</text>
+  <text x="1560" y="478" text-anchor="middle" class="small">next image + image summary</text>
+  <rect x="1450" y="304" width="220" height="22" rx="11" fill="#e8f4f7" stroke="#a6cdd8" stroke-width="1"/>
+  <text x="1560" y="320" text-anchor="middle" class="tag" fill="#155e63">image generation backend</text>
+
+  <path d="M 375 368 L 475 368" class="mainArrow"/>
+  <text x="425" y="348" text-anchor="middle" class="mono">context</text>
+  <path d="M 805 368 L 905 368" class="mainArrow"/>
+  <text x="855" y="348" text-anchor="middle" class="mono">intent</text>
+  <path d="M 1265 368 L 1385 368" class="mainArrow"/>
+  <text x="1325" y="348" text-anchor="middle" class="mono">prompt</text>
+
+  <rect x="235" y="680" width="1430" height="260" rx="16" fill="url(#memoryFill)" stroke="#9a6b21" stroke-width="2.5" filter="url(#softShadow)"/>
+  <text x="950" y="730" text-anchor="middle" class="moduleTitle">Memory</text>
+  <text x="950" y="758" text-anchor="middle" class="moduleSub">persistent state shared across interaction turns</text>
+
+  <rect x="305" y="800" width="370" height="94" rx="10" fill="#ffffff" stroke="#d8b779" stroke-width="1.8"/>
+  <text x="490" y="832" text-anchor="middle" class="sectionTitle">Perception Updates</text>
+  <text x="490" y="861" text-anchor="middle" class="small">entities, user intent, user profile</text>
+
+  <rect x="765" y="800" width="370" height="94" rx="10" fill="#ffffff" stroke="#d8b779" stroke-width="1.8"/>
+  <text x="950" y="832" text-anchor="middle" class="sectionTitle">Planning Updates</text>
+  <text x="950" y="861" text-anchor="middle" class="small">world state, user profile</text>
+
+  <rect x="1225" y="800" width="370" height="94" rx="10" fill="#ffffff" stroke="#d8b779" stroke-width="1.8"/>
+  <text x="1410" y="832" text-anchor="middle" class="sectionTitle">Rendering Updates</text>
+  <text x="1410" y="861" text-anchor="middle" class="small">next image summary</text>
+
+  <path d="M 640 525 C 640 585, 545 628, 490 800" class="memoryArrow"/>
+  <path d="M 1085 525 C 1085 585, 1005 628, 950 800" class="memoryArrow"/>
+  <path d="M 1560 525 C 1560 585, 1465 628, 1410 800" class="memoryArrow"/>
+
+  <path d="M 950 680 C 910 612, 760 582, 665 525" class="feedbackArrow"/>
+  <path d="M 950 680 C 950 610, 1000 570, 1065 525" class="feedbackArrow"/>
+  <path d="M 950 680 C 1065 602, 1300 570, 1510 525" class="feedbackArrow"/>
+  <text x="980" y="628" class="small">state feedback</text>
+
+  <rect x="120" y="985" width="440" height="54" rx="8" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5"/>
+  <line x1="150" y1="1005" x2="214" y2="1005" stroke="#263238" stroke-width="3" marker-end="url(#arrowMain)"/>
+  <text x="235" y="1010" class="small">main inference path</text>
+  <line x1="150" y1="1025" x2="214" y2="1025" stroke="#9a6b21" stroke-width="2.6" stroke-dasharray="9 7" marker-end="url(#arrowMemory)"/>
+  <text x="235" y="1030" class="small">memory read / update path</text>
+</svg>
