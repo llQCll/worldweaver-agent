@@ -1,251 +1,53 @@
 # WorldWeaver Agent
 
-WorldWeaver is a research prototype for interactive narrative image generation. It turns image generation into a closed-loop experience: the system generates a visual story panel, the user clicks or gives feedback, the agent interprets the intent, continues the narrative, and gradually builds a preference profile from the interaction trajectory.
+WorldWeaver Agent is a research prototype for interactive narrative image generation. It explores a simple idea: image generation can become a continuous conversation between a user and a visual story world, rather than a sequence of isolated prompts.
 
-The project is designed around one central research idea:
+In WorldWeaver, the user enters a visual scene, clicks on what they care about, confirms or redirects the system's interpretation, and gradually shapes the next panels of the story. Each generated image is both a continuation of the narrative and a small probe into the user's preferences.
 
-> Interactive image generation should not only produce the next image. It should also preserve narrative continuity, adapt to user preference, and actively collect evidence that refines a user model over time.
+## Core Idea
 
-## Research Framing
+The project connects three layers:
 
-This repository explores three connected layers.
+- **Interactive image generation:** users guide the story by interacting with images instead of repeatedly writing full prompts.
+- **Preference-aware narrative continuity:** the system tries to keep the story coherent while adapting tone, focus, pacing, and visual direction to user preference.
+- **Progressive user modeling:** clicks, choices, and feedback gradually refine a user profile, allowing the system to become more confident about what kind of narrative experience the user wants.
 
-1. **Interactive image generation**
+In paper terms, WorldWeaver can be framed as a closed-loop framework for interactive visual storytelling and incremental user preference modeling.
 
-   The user does not write a full prompt every turn. Instead, they interact with the current image by clicking a region and optionally providing a short hint. The system interprets the click as an interaction intent, proposes candidate intents when confidence is low, and uses the confirmed intent to generate the next story panel.
+## Experience
 
-2. **Preference-aware narrative consistency**
+A typical session begins with an opening image. The user clicks on a character, object, place, or visual detail that interests them. The system interprets the click as a possible narrative intent, asks for confirmation when needed, and then generates the next image as a story continuation.
 
-   The system maintains world memory, story outline, branch state, entities, prior pages, and user preference signals. Each new image is planned as a continuation of the current narrative rather than an isolated prompt. User feedback changes future generation by increasing or decreasing preference dimensions such as narrative alignment, visual alignment, affective alignment, continuity, mystery, novelty, and agency.
+After each generated panel, the user can give lightweight feedback. Over time, the system builds an increasingly specific profile of the user's preferences, such as whether they favor mystery, emotional intimacy, visual spectacle, slower exploration, stronger agency, or tighter story continuity.
 
-3. **Image generation as active user profiling**
+The interaction is meant to feel less like controlling a tool and more like wandering through a living illustrated story that learns what kind of journey the user wants.
 
-   Generated images are also probes. By observing what the user clicks, confirms, likes, rejects, or redirects, the system updates a lightweight user profile. Over multiple panels, the system can raise confidence in specific preference dimensions and produce stage reports that summarize the emerging profile and suggest the next exploration direction.
+## Research Motivation
 
-In paper terms, the project can be described as a **closed-loop framework for interactive narrative image generation and progressive user modeling**.
-
-## Core Features
-
-- Clickable web interface for interactive visual storytelling.
-- OpenAI-compatible text planning backend.
-- OpenAI-compatible vision/perception backend.
-- OpenAI-compatible image generation backend, including `gpt-image-2` style APIs.
-- Intent confirmation flow when the system is uncertain about a click.
-- Story outline generation and revision across turns.
-- Post-panel feedback options for personalization.
-- User profile signals updated from both weak implicit behavior and stronger explicit feedback.
-- Stage report after every 5 generated panels.
-- Next-round prompt input for steering the following story arc.
-- Preview, rollback, and resume controls for previous story states.
-- User trajectory logs with `trajectory.md` and `profile_snapshot.json` snapshots.
-
-## System Architecture
-
-The current system is organized as a multi-agent pipeline:
-
-| Component | Responsibility |
-| --- | --- |
-| `InteractionUnderstandingAgent` / `PerceptionAgent` | Understand the clicked image region and infer local user intent. |
-| `NarrativePlanningAgent` / `PlanningAgent` | Convert interaction intent into a story-level next action. |
-| `FramePlanningAgent` | Translate narrative decisions into renderable image prompts and continuity constraints. |
-| `RenderingAgent` | Generate the next image through mock, local, or OpenAI-compatible backends. |
-| `MemoryAgent` | Store pages, branches, entities, world state, user preference signals, and feedback history. |
-| Web demo backend | Provides FastAPI endpoints for sessions, clicks, intent confirmation, feedback, rollback, narration, and stage reports. |
-
-The typical loop is:
+Most image generation systems treat the user prompt as the main input and the generated image as the final output. WorldWeaver instead treats generation as an ongoing loop:
 
 ```text
-current image
-  -> user click / hint
-  -> perception and intent options
-  -> intent confirmation
-  -> narrative planning
-  -> frame planning
-  -> image rendering
-  -> memory update
-  -> optional feedback
-  -> user profile update
+image -> interaction -> interpretation -> story continuation -> feedback -> user model -> next image
 ```
 
-## Repository Layout
+This loop makes the image serve two purposes at once. It advances the narrative, and it creates an opportunity to observe user preference. A panel can reveal what the user chooses to follow, what they ignore, what they correct, and what they want more or less of.
 
-```text
-src/worldweaver_agent/
-  backends.py              # LLM/VLM/image backend adapters and prompt logic
-  memory.py                # world memory, user preference memory, checkpoints
-  schemas.py               # shared data models
-  interaction.py           # interaction understanding agent
-  narrative_planning.py    # story-level planning agent
-  frame_planning.py        # render-request planning agent
-  rendering.py             # rendering agent
-  orchestrator.py          # end-to-end explorer loop
-scripts/
-  run_web_demo_openai.py   # main OpenAI-compatible web demo
-  run_web_demo.py          # earlier web demo
-  run_demo.py              # CLI demo
-server/
-  qwen_planning_server.py  # lightweight OpenAI-compatible planning server
-  qwen_perception_server.py# lightweight OpenAI-compatible perception server
-web/
-  index_openai.html        # current interactive frontend
-  index.html               # earlier frontend
-docs/
-  worldweaver_agent_paper_architecture.svg
-  story_outlines/
-```
+## Contributions
 
-## Installation
+- A closed-loop interaction model for visual narrative generation.
+- A narrative continuation mechanism that balances local user intent with broader story coherence.
+- A user preference model that evolves from both implicit interaction and explicit feedback.
+- A stage-based reflection mechanism that summarizes the emerging user profile and suggests future story directions.
+- A research framing where generated images are not only outputs, but also active probes for user understanding.
 
-Python 3.10 or newer is recommended.
+## Possible Evaluation Directions
 
-```bash
-pip install -e .
-```
+- Whether generated panels remain narratively coherent across multiple turns.
+- Whether the system correctly follows user-confirmed visual intent.
+- Whether feedback improves alignment with user preference in later panels.
+- Whether the inferred user profile becomes more stable and specific over time.
+- Whether users feel more agency and continuity compared with prompt-only image generation.
 
-The base package installs FastAPI, Uvicorn, OpenAI SDK, and Pydantic. If you use local model servers, install their model/runtime dependencies separately.
+## Paper-Framing Statement
 
-## Quick Start
-
-### 1. Mock rendering mode
-
-Use this mode to test the web interaction flow without spending image generation tokens.
-
-```bash
-python scripts/run_web_demo_openai.py \
-  --host 127.0.0.1 \
-  --port 7860 \
-  --planning-backend rule \
-  --perception-backend rule \
-  --narration-backend rule \
-  --rendering-backend mock
-```
-
-Open:
-
-```text
-http://127.0.0.1:7860
-```
-
-### 2. OpenAI-compatible image generation
-
-Set your image API key in the environment first:
-
-```bash
-set OPENAI_API_KEY=your_api_key_here
-```
-
-Then start the web demo:
-
-```bash
-python scripts/run_web_demo_openai.py \
-  --host 127.0.0.1 \
-  --port 7860 \
-  --planning-backend llm \
-  --llm-endpoint http://127.0.0.1:8000 \
-  --llm-model Qwen3_8B \
-  --llm-api-key EMPTY \
-  --perception-backend llm \
-  --perception-llm-endpoint http://127.0.0.1:8001 \
-  --perception-llm-model Qwen3_VL_8B \
-  --perception-llm-api-key EMPTY \
-  --narration-backend llm \
-  --rendering-backend openai_image \
-  --openai-image-api-key %OPENAI_API_KEY% \
-  --openai-image-model gpt-image-2 \
-  --openai-image-output-dir output_openai \
-  --openai-image-size 1024x1024 \
-  --openai-image-quality high
-```
-
-If your image provider is OpenAI-compatible but not the default OpenAI endpoint, pass:
-
-```bash
---openai-image-base-url https://your-provider.example/v1
-```
-
-### 3. Local OpenAI-compatible planning/perception servers
-
-Planning server:
-
-```bash
-python server/qwen_planning_server.py \
-  --model-path /path/to/Qwen3_8B \
-  --served-model-name Qwen3_8B \
-  --host 127.0.0.1 \
-  --port 8000 \
-  --api-key EMPTY
-```
-
-Perception server:
-
-```bash
-python server/qwen_perception_server.py \
-  --model-path /path/to/Qwen3_VL_8B \
-  --served-model-name Qwen3_VL_8B \
-  --host 127.0.0.1 \
-  --port 8001 \
-  --api-key EMPTY
-```
-
-## Web Interaction Flow
-
-1. Start a new session from a topic, style guide, optional root image, and optional story outline.
-2. The system creates an opening panel.
-3. The user clicks a region in the image.
-4. The system parses the click and may ask the user to confirm one of several textual intent options.
-5. After confirmation, the planning and rendering pipeline generates the next panel.
-6. The user can give feedback such as liking the direction, marking drift, or asking to change mood.
-7. The preference model updates and future panels adapt.
-8. After enough panels, the stage report summarizes the emerging preference profile and suggests a next-round direction.
-
-## User Modeling
-
-The user profile is updated from two signal types:
-
-- **Implicit signals:** click location, clicked subject, focus type, inferred intent, action type, story role, and emotion hint.
-- **Explicit signals:** feedback buttons with weighted axes such as narrative alignment, visual alignment, affective alignment, continuity, novelty, mystery, and agency.
-
-The frontend currently displays:
-
-- a natural-language profile summary,
-- top preference dimensions,
-- stage-level dimension bars,
-- suggestions for the next exploration round.
-
-Trajectory logs are written under:
-
-```text
-user_trajectory_logs/<session_id>/
-```
-
-These logs are ignored by Git because they can contain private user behavior and generated content.
-
-## Paper-Oriented Contribution Statement
-
-A concise contribution statement for the project:
-
-> We present WorldWeaver, an interactive narrative image generation framework that unifies visual generation, user interaction, and progressive user modeling. Unlike one-shot text-to-image systems, WorldWeaver treats each generated image as both a narrative continuation and an interaction probe. The framework maintains story-level continuity, adapts future panels to user preference signals, and incrementally refines a user profile from clicks and feedback.
-
-Possible evaluation directions:
-
-- Narrative continuity across generated panels.
-- Alignment between generated panels and user-confirmed intent.
-- Preference adaptation after explicit feedback.
-- Profile stability and confidence growth over multiple interaction rounds.
-- User study comparing click-based interaction against prompt-only generation.
-
-## Development Notes
-
-Run a syntax check after code changes:
-
-```bash
-python -m compileall src scripts
-```
-
-Generated images, local state, trajectory logs, virtual environments, and ad-hoc secret-bearing test files should not be committed.
-
-## Security Notes
-
-Do not hard-code API keys in source files. Use environment variables or local config files that are excluded by `.gitignore`.
-
-If an API key was ever committed or shared accidentally, revoke and rotate it before publishing the repository.
+WorldWeaver Agent presents interactive image generation as a joint process of storytelling and user modeling. By turning each generated panel into both a narrative step and a preference probe, the system aims to produce visual stories that are continuous, adaptive, and increasingly personalized over time.
